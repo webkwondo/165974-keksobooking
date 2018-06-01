@@ -1,7 +1,7 @@
 # Личный проект «Кексобукинг» [![Build status][travis-image]][travis-url]
 
 * Студент: [Elena Markova](https://up.htmlacademy.ru/javascript/14/user/165974).
-* Наставник: `Неизвестно`.
+* Наставник: [Артём Коновалов](https://up.htmlacademy.ru/javascript/14/user/297399).
 
 ---
 
