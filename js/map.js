@@ -16,6 +16,9 @@ var roomsMax = 5;
 var guestsMin = 1;
 var guestsMax = 20;
 var offerPhotos = ['http://o0.github.io/assets/images/tokyo/hotel1.jpg', 'http://o0.github.io/assets/images/tokyo/hotel2.jpg', 'http://o0.github.io/assets/images/tokyo/hotel3.jpg'];
+var NUMBER_OF_SIMILAR_OFFERS = 8;
+var MAP_PIN_WIDTH = 50;
+var MAP_PIN_HEIGHT = 70;
 
 var getOfferType = function (str) {
   var offerType = '';
@@ -102,7 +105,7 @@ var getCoordinateY = function (minY, maxY) {
 
 var similarOffers = [];
 
-for (var i = 0; i < 8; i++) {
+for (var i = 0; i < NUMBER_OF_SIMILAR_OFFERS; i++) {
   similarOffers[i] =
   {
     author: {
@@ -141,14 +144,8 @@ var similarMapPinsTemplate = document.querySelector('template')
 var renderMapPin = function (similarOffer) {
   var mapPinElement = similarMapPinsTemplate.cloneNode(true);
 
-  mapPinElement.style.left = similarOffer.location.x + 'px';
-  // mapPinElement.style.left = (similarOffer.location.x - mapPinElement.offsetWidth / 2) + 'px';
-  // console.log(mapPinElement.offsetWidth);
-  // console.log(similarOffer.location.x);
-  mapPinElement.style.top = similarOffer.location.y + 'px';
-  // mapPinElement.style.top = (similarOffer.location.y - mapPinElement.offsetHeight) + 'px';
-  // console.log(mapPinElement.offsetHeight);
-  // console.log(similarOffer.location.y);
+  mapPinElement.style.left = (similarOffer.location.x - MAP_PIN_WIDTH / 2) + 'px';
+  mapPinElement.style.top = (similarOffer.location.y - MAP_PIN_HEIGHT) + 'px';
   mapPinElement.querySelector('img').src = similarOffer.author.avatar;
   mapPinElement.querySelector('img').alt = similarOffer.offer.title;
 
@@ -199,26 +196,27 @@ var renderMapCard = function (similarOffer) {
   mapCardElement.querySelector('.popup__text--capacity').textContent = similarOffer.offer.rooms + ' комнаты для ' + similarOffer.offer.guests + ' гостей';
   mapCardElement.querySelector('.popup__text--time').textContent = 'Заезд после ' + similarOffer.offer.checkin + ', выезд до ' + similarOffer.offer.checkout;
 
+  var popupFeatures = mapCardElement.querySelector('.popup__features');
   var similarOfferFeaturesHtml = '';
   for (var u = 0; u < similarOffer.offer.features.length; u++) {
     var similarOfferFeatureHtml = '<li class="popup__feature popup__feature--' + similarOffer.offer.features[u] + '"></li>';
     similarOfferFeaturesHtml += similarOfferFeatureHtml;
   }
-  mapCardElement.querySelector('.popup__features').innerHTML = similarOfferFeaturesHtml;
+  popupFeatures.innerHTML = '';
+  popupFeatures.insertAdjacentHTML('afterbegin', similarOfferFeaturesHtml);
 
   mapCardElement.querySelector('.popup__description').textContent = similarOffer.offer.description;
 
-  var offerPhotosElement = mapCardElement.querySelector('.popup__photos');
-  var offerPhotoElement = mapCardElement.querySelector('.popup__photo');
-  var offerPhotoTempElement = offerPhotosElement.removeChild(offerPhotoElement);
+  var popupPhotos = mapCardElement.querySelector('.popup__photos');
+  var popupPhoto = mapCardElement.querySelector('.popup__photo');
+  var popupPhotoTemp = popupPhotos.removeChild(popupPhoto);
   for (var n = 0; n < similarOffer.offer.photos.length; n++) {
-    var offerPhotoElementCopy = offerPhotoTempElement.cloneNode();
-    offerPhotoElementCopy.src = similarOffer.offer.photos[n];
-    offerPhotosElement.appendChild(offerPhotoElementCopy);
+    var popupPhotoCopy = popupPhotoTemp.cloneNode();
+    popupPhotoCopy.src = similarOffer.offer.photos[n];
+    popupPhotos.appendChild(popupPhotoCopy);
   }
 
   return mapCardElement;
 };
 
-fragment.appendChild(renderMapCard(similarOffers[0]));
-map.insertBefore(fragment, mapFiltersContainer);
+map.insertBefore(renderMapCard(similarOffers[0]), mapFiltersContainer);
