@@ -367,11 +367,7 @@ var setMinPrice = function () {
   adFormPriceInput.placeholder = adFormPriceInputPlaceholder;
 };
 
-adFormTypeSelect.addEventListener('change', function () {
-  setMinPrice();
-});
-
-adFormPriceInput.addEventListener('invalid', function () {
+var onPriceInputInvalid = function (evt) {
   if (adFormPriceInput.validity.rangeUnderflow) {
     adFormPriceInput.setCustomValidity('Цена не может быть меньше ' + adFormPriceInputMin + ' руб.');
   } else if (adFormPriceInput.validity.rangeOverflow) {
@@ -381,6 +377,16 @@ adFormPriceInput.addEventListener('invalid', function () {
   } else {
     adFormPriceInput.setCustomValidity('');
   }
+};
+
+adFormTypeSelect.addEventListener('change', function () {
+  setMinPrice();
+});
+
+adFormPriceInput.addEventListener('invalid', onPriceInputInvalid);
+
+adFormPriceInput.addEventListener('change', function () {
+  adFormPriceInput.addEventListener('invalid', onPriceInputInvalid);
 });
 
 var adFormCheckinTimeSelect = adForm.querySelector('#timein');
@@ -444,4 +450,25 @@ syncAdFormRoomsAndCapacity();
 
 adFormRoomsSelect.addEventListener('change', function () {
   syncAdFormRoomsAndCapacity();
+});
+
+var onCapacitySelectInvalid = function (evt) {
+  if (adFormCapacitySelect.validity.typeMismatch) {
+    adFormCapacitySelect.setCustomValidity('Недопустимое значение. Пожалуйста, попробуйте выбрать заново');
+  } else {
+    adFormCapacitySelect.setCustomValidity('');
+  }
+};
+
+adFormCapacitySelect.addEventListener('invalid', onCapacitySelectInvalid);
+
+var adFormSubmit = adForm.querySelector('.ad-form__submit');
+
+adFormSubmit.addEventListener('click', function (evt) {
+  if (adFormCapacitySelect.options[adFormCapacitySelect.selectedIndex].disabled === true) {
+    evt.preventDefault();
+    // adFormCapacitySelect.setCustomValidity('Недопустимое значение. Пожалуйста, попробуйте выбрать заново');
+    // adFormCapacitySelect.validity.valid = false;
+    // adFormCapacitySelect.validity.typeMismatch = true;
+  }
 });
