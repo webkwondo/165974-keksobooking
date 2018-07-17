@@ -367,7 +367,7 @@ var setMinPrice = function () {
   adFormPriceInput.placeholder = adFormPriceInputPlaceholder;
 };
 
-var onPriceInputInvalid = function (evt) {
+var onPriceInputInvalid = function () {
   if (adFormPriceInput.validity.rangeUnderflow) {
     adFormPriceInput.setCustomValidity('Цена не может быть меньше ' + adFormPriceInputMin + ' руб.');
   } else if (adFormPriceInput.validity.rangeOverflow) {
@@ -452,7 +452,7 @@ adFormRoomsSelect.addEventListener('change', function () {
   syncAdFormRoomsAndCapacity();
 });
 
-var onCapacitySelectInvalid = function (evt) {
+var onCapacitySelectInvalid = function () {
   if (adFormCapacitySelect.validity.typeMismatch) {
     adFormCapacitySelect.setCustomValidity('Недопустимое значение. Пожалуйста, попробуйте выбрать заново');
   } else {
