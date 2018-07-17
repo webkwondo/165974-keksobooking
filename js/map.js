@@ -450,25 +450,17 @@ syncAdFormRoomsAndCapacity();
 
 adFormRoomsSelect.addEventListener('change', function () {
   syncAdFormRoomsAndCapacity();
-});
-
-var onCapacitySelectInvalid = function () {
-  if (adFormCapacitySelect.validity.typeMismatch) {
+  if (adFormCapacitySelect.options[adFormCapacitySelect.selectedIndex].disabled === true) {
     adFormCapacitySelect.setCustomValidity('Недопустимое значение. Пожалуйста, попробуйте выбрать заново');
   } else {
     adFormCapacitySelect.setCustomValidity('');
   }
-};
+});
 
-adFormCapacitySelect.addEventListener('invalid', onCapacitySelectInvalid);
-
-var adFormSubmit = adForm.querySelector('.ad-form__submit');
-
-adFormSubmit.addEventListener('click', function (evt) {
+adFormCapacitySelect.addEventListener('change', function () {
   if (adFormCapacitySelect.options[adFormCapacitySelect.selectedIndex].disabled === true) {
-    evt.preventDefault();
-    // adFormCapacitySelect.setCustomValidity('Недопустимое значение. Пожалуйста, попробуйте выбрать заново');
-    // adFormCapacitySelect.validity.valid = false;
-    // adFormCapacitySelect.validity.typeMismatch = true;
+    adFormCapacitySelect.setCustomValidity('Недопустимое значение. Пожалуйста, попробуйте выбрать заново');
+  } else {
+    adFormCapacitySelect.setCustomValidity('');
   }
 });
