@@ -69,8 +69,8 @@
     var mapCard = map.insertBefore(renderMapCard(window.data.similarOffers[offerId], offerId), mapFiltersContainer);
 
     var onMapCardEscPress = function (evt) {
-      window.library.isEscEvent(evt, window.constant.ESC_KEYCODE, closeMapCard, mapCard);
-      if (window.library.isEscEvent(evt, window.constant.ESC_KEYCODE, closeMapCard, mapCard)) {
+      window.utils.isEscEvent(evt, window.constant.ESC_KEYCODE, closeMapCard, mapCard);
+      if (window.utils.isEscEvent(evt, window.constant.ESC_KEYCODE, closeMapCard, mapCard)) {
         map.removeEventListener('keydown', onMapCardEscPress);
       }
     };

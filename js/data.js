@@ -7,7 +7,7 @@
   };
 
   var onSuccess = function (downloadedData) {
-    window.data.similarOffers = window.library.getRandomArrayItems(downloadedData, window.constant.NUMBER_OF_SIMILAR_OFFERS, false, false);
+    window.data.similarOffers = downloadedData;
   };
 
   // Пока черновая функция вывода ошибки
