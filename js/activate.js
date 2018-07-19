@@ -46,8 +46,8 @@
   };
 
   var mapPinMain = map.querySelector('.map__pin--main');
-  var mapPinMainWidth = window.library.getElementWidth(mapPinMain);
-  var mapPinMainHeight = window.library.getElementHeight(mapPinMain);
+  var mapPinMainWidth = mapPinMain.offsetWidth;
+  var mapPinMainHeight = mapPinMain.offsetHeight;
 
   var getMapPinMainCoords = function () {
     var mapPinMainCoords = '';
