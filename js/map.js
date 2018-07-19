@@ -103,7 +103,9 @@ var getElementHeight = function (element) {
 var isEscEvent = function (evt, action, elem) {
   if (evt.keyCode === ESC_KEYCODE) {
     action(elem);
+    return true;
   }
+  return false;
 };
 
 var getCoordinateX = function (minX, maxX) {
@@ -252,6 +254,9 @@ var displayMapCard = function (offerId) {
 
   var onMapCardEscPress = function (evt) {
     isEscEvent(evt, closeMapCard, mapCard);
+    if (isEscEvent(evt, closeMapCard, mapCard)) {
+      map.removeEventListener('keydown', onMapCardEscPress);
+    }
   };
 
   map.addEventListener('keydown', onMapCardEscPress);
@@ -263,10 +268,6 @@ var closeMapCard = function (mapCard) {
   if (mapCard.parentNode) {
     mapCard.parentNode.removeChild(mapCard);
   }
-
-  // if (typeof onMapCardEscPress === 'function') {
-  //   map.removeEventListener('keydown', onMapCardEscPress);
-  // }
 };
 
 var adForm = document.querySelector('.ad-form');
@@ -429,11 +430,11 @@ mapPinMain.addEventListener('mousedown', function (evt) {
     writeMapPinMainCoords();
 
     map.removeEventListener('mousemove', onMouseMove);
-    map.removeEventListener('mouseup', onMouseUp);
+    document.removeEventListener('mouseup', onMouseUp);
   };
 
   map.addEventListener('mousemove', onMouseMove);
-  map.addEventListener('mouseup', onMouseUp);
+  document.addEventListener('mouseup', onMouseUp);
 });
 
 var adFormReset = adForm.querySelector('.ad-form__reset');
