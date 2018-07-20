@@ -20,7 +20,8 @@
 
   var displaySuccess = function (successMessage, successClass, parentHtmlElement) {
     var successHtmlElement = document.createElement('div');
-    errorHtmlElement.classList.add(successClass);
+    successHtmlElement.classList.add(successClass);
+    successHtmlElement.textContent = successMessage;
 
     parentHtmlElement.appendChild(successHtmlElement);
 
