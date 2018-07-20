@@ -62,9 +62,7 @@
 
   adFormPriceInput.addEventListener('invalid', onPriceInputInvalid);
 
-  adFormPriceInput.addEventListener('change', function () {
-    adFormPriceInput.addEventListener('invalid', onPriceInputInvalid);
-  });
+  adFormPriceInput.addEventListener('change', onPriceInputInvalid);
 
   var adFormCheckinTimeSelect = adForm.querySelector('#timein');
   var adFormCheckoutTimeSelect = adForm.querySelector('#timeout');
@@ -184,8 +182,9 @@
     elem.classList.add('hidden');
   };
 
-  var adFormErrorMessagePosition = 'relative';
-  var adFormErrorMessagePositionTop = '0';
+  // var adFormErrorMessagePosition = 'fixed';
+  // var adFormErrorMessagePositionTop = '30%';
+  var adFormErrorMessageClass = 'message-block--form-error';
 
   var onFormSubmitSuccess = function (response) {
     if (response) {
@@ -197,7 +196,7 @@
   };
 
   var onFormSubmitError = function (errorMessage) {
-    window.message.displayError(errorMessage, adFormErrorMessagePosition, adFormErrorMessagePositionTop, adForm);
+    window.message.displayError(errorMessage, adFormErrorMessageClass, adForm);
   };
 
   adForm.addEventListener('submit', function (evt) {

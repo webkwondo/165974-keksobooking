@@ -4,8 +4,9 @@
 
   var map = document.querySelector('.map');
   var similarMapPins = map.querySelector('.map__pins');
-  var mapErrorMessagePosition = 'absolute';
-  var mapErrorMessagePositionTop = '38%';
+  // var mapErrorMessagePosition = 'absolute';
+  // var mapErrorMessagePositionTop = '38%';
+  var mapErrorMessageClass = 'message-block--error';
   var adForm = document.querySelector('.ad-form');
   var adFormFieldsets = adForm.querySelectorAll('fieldset');
   var similarOffers = [];
@@ -202,7 +203,7 @@
         activateSystem();
         writeMapPinMainCoords();
         if (downloadError) {
-          window.message.displayError(downloadErrorMessage, mapErrorMessagePosition, mapErrorMessagePositionTop, map);
+          window.message.displayError(downloadErrorMessage, mapErrorMessageClass, map);
         }
         window.pin.displaySimilarMapPins(similarOffersLimited);
         addClickHandlerToMapPins(similarOffersLimited);
