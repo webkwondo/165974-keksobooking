@@ -3,8 +3,65 @@
 (function () {
 
   var map = document.querySelector('.map');
+  var similarMapPins = map.querySelector('.map__pins');
+  // var mapErrorMessagePosition = 'absolute';
+  // var mapErrorMessagePositionTop = '38%';
+  var mapErrorMessageClass = 'message-block--error';
   var adForm = document.querySelector('.ad-form');
   var adFormFieldsets = adForm.querySelectorAll('fieldset');
+  var similarOffers = [];
+  var similarOffersLimited = [];
+  var downloadError = false;
+  var downloadErrorMessage = '';
+
+  var onDownloadSuccess = function (downloadedData) {
+    similarOffers = downloadedData;
+    similarOffersLimited = similarOffers.slice(window.constant.NUMBER_OF_SIMILAR_OFFERS_START, window.constant.NUMBER_OF_SIMILAR_OFFERS);
+  };
+
+  var onDownloadError = function (errorMessage) {
+    if (errorMessage) {
+      downloadError = true;
+      downloadErrorMessage = errorMessage;
+    } else {
+      downloadError = false;
+    }
+  };
+
+  window.backend.download(window.constant.DOWNLOAD_URL, onDownloadSuccess, onDownloadError);
+
+  var addClickHandlerToMapPins = function (data) {
+    var clickedElement = null;
+    var offerid = 0;
+    var mapCardPopup = '';
+    var mapCardPopupCloseButton = '';
+
+    var onMapPinClick = function (evt) {
+      if (clickedElement) {
+        window.card.closeMapCard(mapCardPopup);
+        clickedElement.classList.remove('map__pin--active');
+      }
+
+      clickedElement = evt.currentTarget;
+      offerid = clickedElement.dataset.offerid;
+
+      if (!clickedElement.classList.contains('map__pin--main')) {
+        clickedElement.classList.add('map__pin--active');
+        mapCardPopup = window.card.displayMapCard(data, offerid);
+        mapCardPopupCloseButton = mapCardPopup.querySelector('.popup__close');
+        mapCardPopupCloseButton.addEventListener('click', function () {
+          window.card.closeMapCard(mapCardPopup);
+          clickedElement.classList.remove('map__pin--active');
+        });
+      }
+    };
+
+    var mapPins = similarMapPins.querySelectorAll('.map__pin');
+
+    for (var m = 0; m < mapPins.length; m++) {
+      mapPins[m].addEventListener('click', onMapPinClick);
+    }
+  };
 
   var activateAdFormFields = function (adFormFieldsEnabled) {
     for (var f = 0; f < adFormFieldsets.length; f++) {
@@ -70,9 +127,44 @@
   var mapPinMainStartPositionLeft = mapPinMain.style.left;
   var mapPinMainStartPositionTop = mapPinMain.style.top;
 
-  var mapPinMainReset = function () {
+  var resetMapPinMain = function () {
     mapPinMain.style.left = mapPinMainStartPositionLeft;
     mapPinMain.style.top = mapPinMainStartPositionTop;
+    writeMapPinMainCoords();
+  };
+
+  var mapPinMainPositionLimits = {
+    limitLeft: 0 - window.constant.MAP_PIN_MAIN_WIDTH / 2,
+    limitRight: map.offsetWidth - window.constant.MAP_PIN_MAIN_WIDTH / 2,
+    limitTop: window.constant.COORDINATE_MIN_Y - window.constant.MAP_PIN_MAIN_HEIGHT,
+    limitBottom: window.constant.COORDINATE_MAX_Y - window.constant.MAP_PIN_MAIN_HEIGHT
+  };
+
+  if (mapActive) {
+    mapPinMainPositionLimits = {
+      limitLeft: 0 - mapPinMain.offsetWidth / 2,
+      limitRight: map.offsetWidth - mapPinMain.offsetWidth / 2,
+      limitTop: window.constant.COORDINATE_MIN_Y - mapPinMain.offsetHeight,
+      limitBottom: window.constant.COORDINATE_MAX_Y - mapPinMain.offsetHeight
+    };
+  }
+
+  var limitElementMovement = function (element, position, positionLimits) {
+    if (position.x < positionLimits.limitLeft) {
+      element.style.left = positionLimits.limitLeft + 'px';
+    } else if (position.x > positionLimits.limitRight) {
+      element.style.left = positionLimits.limitRight + 'px';
+    } else {
+      element.style.left = position.x + 'px';
+    }
+
+    if (position.y < positionLimits.limitTop) {
+      element.style.top = positionLimits.limitTop + 'px';
+    } else if (position.y > positionLimits.limitBottom) {
+      element.style.top = positionLimits.limitBottom + 'px';
+    } else {
+      element.style.top = position.y + 'px';
+    }
   };
 
   mapPinMain.addEventListener('mousedown', function (evt) {
@@ -97,34 +189,12 @@
         y: moveEvt.clientY
       };
 
-      var limitLeft = 0 - window.constant.MAP_PIN_MAIN_WIDTH / 2;
-      var limitRight = map.offsetWidth - window.constant.MAP_PIN_MAIN_WIDTH / 2;
-      var limitTop = window.constant.COORDINATE_MIN_Y - window.constant.MAP_PIN_MAIN_HEIGHT;
-      var limitBottom = window.constant.COORDINATE_MAX_Y - window.constant.MAP_PIN_MAIN_HEIGHT;
+      var mapPinMainCoords = {
+        x: mapPinMain.offsetLeft - shift.x,
+        y: mapPinMain.offsetTop - shift.y
+      };
 
-      if (mapActive) {
-        limitLeft = 0 - mapPinMain.offsetWidth / 2;
-        limitRight = map.offsetWidth - mapPinMain.offsetWidth / 2;
-        limitTop = window.constant.COORDINATE_MIN_Y - mapPinMain.offsetHeight;
-        limitBottom = window.constant.COORDINATE_MAX_Y - mapPinMain.offsetHeight;
-      }
-
-      var mapPinMainCoordX = mapPinMain.offsetLeft - shift.x;
-      var mapPinMainCoordY = mapPinMain.offsetTop - shift.y;
-
-      mapPinMain.style.left = mapPinMainCoordX + 'px';
-
-      if (mapPinMainCoordX < limitLeft) {
-        mapPinMain.style.left = limitLeft + 'px';
-      } else if (mapPinMainCoordX > limitRight) {
-        mapPinMain.style.left = limitRight + 'px';
-      } else if (mapPinMainCoordY < limitTop) {
-        mapPinMain.style.top = limitTop + 'px';
-      } else if (mapPinMainCoordY > limitBottom) {
-        mapPinMain.style.top = limitBottom + 'px';
-      } else {
-        mapPinMain.style.top = mapPinMainCoordY + 'px';
-      }
+      limitElementMovement(mapPinMain, mapPinMainCoords, mapPinMainPositionLimits);
     };
 
     var onMouseUp = function (upEvt) {
@@ -132,8 +202,11 @@
       if (!mapActive) {
         activateSystem();
         writeMapPinMainCoords();
-        window.pin.displaySimilarMapPins();
-        window.map.addClickHandlerToMapPins();
+        if (downloadError) {
+          window.message.displayError(downloadErrorMessage, mapErrorMessageClass, map);
+        }
+        window.pin.displaySimilarMapPins(similarOffersLimited);
+        addClickHandlerToMapPins(similarOffersLimited);
       }
       writeMapPinMainCoords();
 
@@ -145,11 +218,31 @@
     document.addEventListener('mouseup', onMouseUp);
   });
 
+  var mapFiltersForm = map.querySelector('.map__filters');
+
+  var onMapFiltersFormChange = function () {
+    var changeMapPins = function () {
+      var mapCardPopup = map.querySelector('.map__card');
+      if (mapCardPopup) {
+        window.card.closeMapCard(mapCardPopup);
+      }
+      window.pin.clearMapPins();
+      var filteredOffers = window.filter.getFilteredOffers(similarOffers);
+      var filteredOffersLimited = filteredOffers.slice(window.constant.NUMBER_OF_SIMILAR_OFFERS_START, window.constant.NUMBER_OF_SIMILAR_OFFERS);
+      window.pin.displaySimilarMapPins(filteredOffersLimited);
+      addClickHandlerToMapPins(filteredOffersLimited);
+    };
+
+    window.debounce.setDebounce(changeMapPins);
+  };
+
+  mapFiltersForm.addEventListener('change', onMapFiltersFormChange);
+
   window.activate = {
     activateSystem: activateSystem,
     deactivateMap: deactivateMap,
     deactivateAdForm: deactivateAdForm,
-    mapPinMainReset: mapPinMainReset
+    resetMapPinMain: resetMapPinMain
   };
 
 })();

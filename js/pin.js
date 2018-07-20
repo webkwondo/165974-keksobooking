@@ -20,11 +20,11 @@
     return mapPinElement;
   };
 
-  var displaySimilarMapPins = function () {
+  var displaySimilarMapPins = function (data) {
     var fragment = document.createDocumentFragment();
 
-    for (var d = 0; d < window.data.similarOffers.length; d++) {
-      fragment.appendChild(renderMapPin(window.data.similarOffers[d], d));
+    for (var d = 0; d < data.length; d++) {
+      fragment.appendChild(renderMapPin(data[d], d));
     }
     similarMapPins.appendChild(fragment);
   };

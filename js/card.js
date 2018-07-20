@@ -65,8 +65,8 @@
     return mapCardElement;
   };
 
-  var displayMapCard = function (offerId) {
-    var mapCard = map.insertBefore(renderMapCard(window.data.similarOffers[offerId], offerId), mapFiltersContainer);
+  var displayMapCard = function (data, offerId) {
+    var mapCard = map.insertBefore(renderMapCard(data[offerId], offerId), mapFiltersContainer);
 
     var onMapCardEscPress = function (evt) {
       window.utils.isEscEvent(evt, window.constant.ESC_KEYCODE, closeMapCard, mapCard);
