@@ -144,29 +144,61 @@
 
   var adFormReset = adForm.querySelector('.ad-form__reset');
 
-  adFormReset.addEventListener('click', function (evt) {
-    evt.preventDefault();
+  var resetMap = function () {
+    var mapCardPopup = document.querySelector('.map .map__card');
+    if (mapCardPopup) {
+      window.card.closeMapCard(mapCardPopup);
+    }
     window.pin.clearMapPins();
     window.activate.deactivateMap();
+    window.activate.resetMapPinMain();
+  };
+
+  adFormReset.addEventListener('click', function (evt) {
+    evt.preventDefault();
+    adForm.reset();
+    setMinPrice();
+    resetMap();
     window.activate.deactivateAdForm();
-    window.activate.mapPinMainReset();
   });
 
-  adForm.addEventListener('submit', function (evt) {
-    window.backend.upload(window.constant.UPLOAD_URL, new FormData(adForm), function (response) {
-      adForm.classList.add('form-has-been-sent');
-      // console.log(response);
-      var node = document.createElement('div');
-      node.style = 'z-index: 100; margin: 0 auto; text-align: center; background-color: green;';
-      // node.style.position = 'relative';
-      node.style.left = 0;
-      node.style.right = 0;
-      node.style.fontSize = '30px';
-      if (response) {
-        node.textContent = 'Форма отправлена успешно';
-      }
-      adForm.insertAdjacentElement('beforeend', node);
+  var adFormSuccessBlock = document.querySelector('.success');
+
+  var onAdFormSuccessBlockEscPress = function (evt) {
+    window.utils.isEscEvent(evt, window.constant.ESC_KEYCODE, closeAdFormSuccessBlock, adFormSuccessBlock);
+    document.removeEventListener('keydown', onAdFormSuccessBlockEscPress);
+  };
+
+  var displayAdFormSuccessBlock = function () {
+    adFormSuccessBlock.classList.remove('hidden');
+    adFormSuccessBlock.addEventListener('click', function () {
+      closeAdFormSuccessBlock(adFormSuccessBlock);
     });
+    document.addEventListener('keydown', onAdFormSuccessBlockEscPress);
+  };
+
+  var closeAdFormSuccessBlock = function (elem) {
+    elem.classList.add('hidden');
+  };
+
+  var adFormErrorMessagePosition = 'relative';
+  var adFormErrorMessagePositionTop = '0';
+
+  var onFormSubmitSuccess = function (response) {
+    if (response) {
+      adForm.reset();
+      setMinPrice();
+      resetMap();
+      displayAdFormSuccessBlock();
+    }
+  };
+
+  var onFormSubmitError = function (errorMessage) {
+    window.message.displayError(errorMessage, adFormErrorMessagePosition, adFormErrorMessagePositionTop, adForm);
+  };
+
+  adForm.addEventListener('submit', function (evt) {
+    window.backend.upload(window.constant.UPLOAD_URL, new FormData(adForm), onFormSubmitSuccess, onFormSubmitError);
     evt.preventDefault();
   });
 
