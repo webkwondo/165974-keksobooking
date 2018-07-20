@@ -145,13 +145,16 @@
   var adFormReset = adForm.querySelector('.ad-form__reset');
 
   var resetMap = function () {
-    var mapCardPopup = document.querySelector('.map .map__card');
+    var map = document.querySelector('.map');
+    var mapFiltersForm = map.querySelector('.map__filters');
+    var mapCardPopup = map.querySelector('.map__card');
     if (mapCardPopup) {
       window.card.closeMapCard(mapCardPopup);
     }
     window.pin.clearMapPins();
     window.activate.deactivateMap();
     window.activate.resetMapPinMain();
+    mapFiltersForm.reset();
   };
 
   adFormReset.addEventListener('click', function (evt) {

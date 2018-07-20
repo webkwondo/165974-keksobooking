@@ -9,11 +9,13 @@
   var adForm = document.querySelector('.ad-form');
   var adFormFieldsets = adForm.querySelectorAll('fieldset');
   var similarOffers = [];
+  var similarOffersLimited = [];
   var downloadError = false;
   var downloadErrorMessage = '';
 
   var onDownloadSuccess = function (downloadedData) {
     similarOffers = downloadedData;
+    similarOffersLimited = similarOffers.slice(window.constant.NUMBER_OF_SIMILAR_OFFERS_START, window.constant.NUMBER_OF_SIMILAR_OFFERS);
   };
 
   var onDownloadError = function (errorMessage) {
@@ -202,8 +204,8 @@
         if (downloadError) {
           window.message.displayError(downloadErrorMessage, mapErrorMessagePosition, mapErrorMessagePositionTop, map);
         }
-        window.pin.displaySimilarMapPins(similarOffers);
-        addClickHandlerToMapPins(similarOffers);
+        window.pin.displaySimilarMapPins(similarOffersLimited);
+        addClickHandlerToMapPins(similarOffersLimited);
       }
       writeMapPinMainCoords();
 
@@ -225,8 +227,9 @@
       }
       window.pin.clearMapPins();
       var filteredOffers = window.filter.getFilteredOffers(similarOffers);
-      window.pin.displaySimilarMapPins(filteredOffers);
-      addClickHandlerToMapPins(filteredOffers);
+      var filteredOffersLimited = filteredOffers.slice(window.constant.NUMBER_OF_SIMILAR_OFFERS_START, window.constant.NUMBER_OF_SIMILAR_OFFERS);
+      window.pin.displaySimilarMapPins(filteredOffersLimited);
+      addClickHandlerToMapPins(filteredOffersLimited);
     };
 
     window.debounce.setDebounce(changeMapPins);
