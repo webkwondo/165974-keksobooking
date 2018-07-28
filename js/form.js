@@ -2,6 +2,27 @@
 
 (function () {
 
+  var Type = {
+    BUNGALO: 'bungalo',
+    FLAT: 'flat',
+    HOUSE: 'house',
+    PALACE: 'palace'
+  };
+
+  var MinPrice = {
+    BUNGALO: 0,
+    FLAT: 1000,
+    HOUSE: 5000,
+    PALACE: 10000
+  };
+
+  var Rooms = {
+    ONE: '1',
+    TWO: '2',
+    THREE: '3',
+    HUNDRED: '100'
+  };
+
   var adForm = document.querySelector('.ad-form');
   var adFormTitleInput = adForm.querySelector('#title');
 
@@ -26,17 +47,17 @@
     var adFormTypeSelectedValue = adFormTypeSelect.options[adFormTypeSelect.selectedIndex].value;
 
     switch (adFormTypeSelectedValue) {
-      case 'bungalo':
-        adFormPriceInputMin = 0;
+      case Type.BUNGALO:
+        adFormPriceInputMin = MinPrice.BUNGALO;
         break;
-      case 'flat':
-        adFormPriceInputMin = 1000;
+      case Type.FLAT:
+        adFormPriceInputMin = MinPrice.FLAT;
         break;
-      case 'house':
-        adFormPriceInputMin = 5000;
+      case Type.HOUSE:
+        adFormPriceInputMin = MinPrice.HOUSE;
         break;
-      case 'palace':
-        adFormPriceInputMin = 10000;
+      case Type.PALACE:
+        adFormPriceInputMin = MinPrice.PALACE;
         break;
     }
     adFormPriceInputPlaceholder = adFormPriceInputMin;
@@ -101,19 +122,19 @@
     var adFormRoomsSelectedValue = adFormRoomsSelect.options[adFormRoomsSelect.selectedIndex].value;
 
     switch (adFormRoomsSelectedValue) {
-      case '1':
+      case Rooms.ONE:
         adFormCapacitySelectOption0.disabled = true;
         adFormCapacitySelectOption2.disabled = true;
         adFormCapacitySelectOption3.disabled = true;
         break;
-      case '2':
+      case Rooms.TWO:
         adFormCapacitySelectOption0.disabled = true;
         adFormCapacitySelectOption3.disabled = true;
         break;
-      case '3':
+      case Rooms.THREE:
         adFormCapacitySelectOption0.disabled = true;
         break;
-      case '100':
+      case Rooms.HUNDRED:
         adFormCapacitySelectOption1.disabled = true;
         adFormCapacitySelectOption2.disabled = true;
         adFormCapacitySelectOption3.disabled = true;
@@ -123,21 +144,21 @@
 
   syncAdFormRoomsAndCapacity();
 
-  adFormRoomsSelect.addEventListener('change', function () {
-    syncAdFormRoomsAndCapacity();
-    if (adFormCapacitySelect.options[adFormCapacitySelect.selectedIndex].disabled === true) {
+  var checkAdFormCapacitySelect = function () {
+    if (adFormCapacitySelect.options[adFormCapacitySelect.selectedIndex].disabled) {
       adFormCapacitySelect.setCustomValidity('Недопустимое значение. Пожалуйста, попробуйте выбрать заново');
     } else {
       adFormCapacitySelect.setCustomValidity('');
     }
+  };
+
+  adFormRoomsSelect.addEventListener('change', function () {
+    syncAdFormRoomsAndCapacity();
+    checkAdFormCapacitySelect();
   });
 
   adFormCapacitySelect.addEventListener('change', function () {
-    if (adFormCapacitySelect.options[adFormCapacitySelect.selectedIndex].disabled === true) {
-      adFormCapacitySelect.setCustomValidity('Недопустимое значение. Пожалуйста, попробуйте выбрать заново');
-    } else {
-      adFormCapacitySelect.setCustomValidity('');
-    }
+    checkAdFormCapacitySelect();
   });
 
   var adFormReset = adForm.querySelector('.ad-form__reset');
@@ -155,12 +176,18 @@
     mapFiltersForm.reset();
   };
 
-  adFormReset.addEventListener('click', function (evt) {
-    evt.preventDefault();
+  var resetAdForm = function () {
     adForm.reset();
     setMinPrice();
-    resetMap();
+    syncAdFormRoomsAndCapacity();
+    window.file.removeAdFormFiles();
     window.activate.deactivateAdForm();
+  };
+
+  adFormReset.addEventListener('click', function (evt) {
+    evt.preventDefault();
+    resetAdForm();
+    resetMap();
   });
 
   var adFormSuccessBlock = document.querySelector('.success');
@@ -182,14 +209,11 @@
     elem.classList.add('hidden');
   };
 
-  // var adFormErrorMessagePosition = 'fixed';
-  // var adFormErrorMessagePositionTop = '30%';
   var adFormErrorMessageClass = 'message-block--form-error';
 
   var onFormSubmitSuccess = function (response) {
     if (response) {
-      adForm.reset();
-      setMinPrice();
+      resetAdForm();
       resetMap();
       displayAdFormSuccessBlock();
     }
